@@ -49,13 +49,15 @@
 
      <div class="row">
     <label for="LicensePlateInput" class="Column">License Plate :</label>
-    <input type="text" class="Column" style="margin-left:40px;width:180px" placeholder="Enter License Plate" v-model="Vehicle.LicensePlate">
+    <input type="text" class="Column" style="margin-left:40px;width:180px" placeholder="Format : 000-00-000" v-model="Vehicle.LicensePlate">
+     <label style="margin-left:10px" class="Column">e.g, 123-45-678</label>
     <p style="color:red">{{errorLicensePlate}}</p>
    </div>
 
     <div class="row">
     <label for="ActivationMonthInput" class="Column">Activation Month :</label>
     <input type="month" class="Column" style="width:180px;margin-left:16px" max="2019-03" min="2015-03" v-model="Vehicle.ActivationMonth">
+    <p class="Column">{{Vehicle.ActivationMonth}}</p>
     <label style="margin-left:10px" class="Column">e.g, April 2018</label>
     <p style="color:red" >{{errorActivationMonth}}</p>
     
@@ -159,6 +161,32 @@ export default {
 
         },
         methods:{
+            dateValidation(){
+                let currentDate = new Date();
+                let month = currentDate.getUTCMonth() + 1;
+                let year = currentDate.getUTCFullYear();
+
+                let yearFromInput = this.Vehicle.ActivationMonth.split("-");
+                if(year - parseInt(yearFromInput[0]) > 4){
+                    return false;
+                }else if((year - parseInt(yearFromInput[0])) == 4){
+                     if(parseInt(yearFromInput[1] >= month)){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                }else if((year - parseInt(yearFromInput[0])) == 0){
+                        if(month >= parseInt(yearFromInput[1])){
+                            return true;
+                        }else{
+                            return false;
+                        }
+                }else if((year - parseInt(yearFromInput[0])) < 0){
+                    return false;
+                }else{
+                    return true;
+                }
+            },
             checkActivationYear(){
                 let currentDate = new Date();
                 let month = currentDate.getUTCMonth() + 1;
@@ -207,7 +235,7 @@ export default {
                         this.Vehicle.LicensePlate = p.LicensePlate;
                         this.Vehicle.ActivationMonth = p.ActivationMonth;
                         this.Vehicle.PurchaseMonth = p.PurchaseMonth;
-                        this.Vehicle.BatteryExpiryDate = p.BatteryExpiryDate;
+                        this.Vehicle.BatteryExpiryDate = p.BatteryExpiryDate.substring(0,10);
                         this.Vehicle.Remarks=p.Remarks;
                     }
                 });
@@ -248,8 +276,8 @@ export default {
                     this.errorPurchaseMonth="Please fill the Purchase month field";
                 }/*else if(this.CheckIfActivationAfterPurchase() == false){
                     this.errorActivationMonth="Cannot activate before purchase !!";
-                }*/else if(this.checkActivationYear() == false){
-                    this.errorActivationMonth="Cannot Add car that was activated for more than 4 years !";
+                }*/else if(this.dateValidation() == false){
+                    this.errorActivationMonth="The Activation Month should be between 2019/3 - 2015/3";
                 }else{
                     this.Vehicle.VehicleID = parseInt(this.Vehicle.VehicleID);
                     this.Vehicle.VehicleTypeID = parseInt(this.SelectedTypeID);
