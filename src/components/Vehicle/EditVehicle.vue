@@ -57,7 +57,6 @@
     <div class="row">
     <label for="ActivationMonthInput" class="Column">Activation Month :</label>
     <input type="month" class="Column" style="width:180px;margin-left:16px" max="2019-03" min="2015-03" v-model="Vehicle.ActivationMonth">
-    <p class="Column">{{Vehicle.ActivationMonth}}</p>
     <label style="margin-left:10px" class="Column">e.g, April 2018</label>
     <p style="color:red" >{{errorActivationMonth}}</p>
     
