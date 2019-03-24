@@ -24,6 +24,5 @@ npm run test
 ```
 npm run lint
 ```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### To use this website online go to : 
+https://fleetapp.herokuapp.com
