@@ -83,7 +83,12 @@ export default{
         holy(){
             this.increment(10);
         },
+        resetError(){
+             this.error="";
+        this.errorCompanyName = "";
+        },
         EditCompany(){
+            this.resetError();
             let tempV = {};
             let companyN ='';
             if(this.SelectedID === -1){
@@ -139,6 +144,7 @@ export default{
             //Need to ADD connection to the database !!
             let tempcompany ={};
             let statusOfQuery='';
+            this.resetError();
             const index = this.AllCompanies.findIndex(p => p.VehicleCompanyID === parseInt(this.StringID));
             if(index === -1 && this.Company.CompanyName !== ''){
                 this.Company.VehicleCompanyID = parseInt(this.StringID);
