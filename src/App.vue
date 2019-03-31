@@ -17,7 +17,7 @@
       },
       methods:{
        getCompanies(){
-           let uri = 'https://fleetmanagment.herokuapp.com/getCompanies';
+           let uri = 'https://fleetmanagementserver.herokuapp.com/getCompanies';
          this.axios.get(uri).then(response => {
             response.data.forEach(e =>{
                this.$store.dispatch('addVehicleCompany',e);
@@ -26,7 +26,7 @@
 
       },
       getVehiclesTypes(){
-          let uri = 'https://fleetmanagment.herokuapp.com/getVehicleTypes';
+          let uri = 'https://fleetmanagementserver.herokuapp.com/getVehicleTypes';
          this.axios.get(uri).then(response => {
             response.data.forEach(e =>{
                this.$store.dispatch('addVehicleType',e);
@@ -37,7 +37,7 @@
       },
       getVehicles(){
 
-        let uri = 'https://fleetmanagment.herokuapp.com/getVehicles';
+        let uri = 'https://fleetmanagementserver.herokuapp.com/getVehicles';
          this.axios.get(uri).then(response => {
             response.data.forEach(e =>{
                this.$store.dispatch('addVehicle',e);

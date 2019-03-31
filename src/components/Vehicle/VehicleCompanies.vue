@@ -87,7 +87,7 @@ export default{
             this.resetError();
             let tempV = {};
               tempV = Object.assign({},this.Company);
-                    let uri = `https://fleetmanagment.herokuapp.com/updateCompany/${this.Company.VehicleCompanyID}`;
+                    let uri = `https://fleetmanagementserver.herokuapp.com/updateCompany/${this.Company.VehicleCompanyID}`;
                 this.axios.post(uri, {CompanyName : this.Company.CompanyName }).then((response) => {
                   console.log(`response from update company ! ${response.status}`);
                   if(response.status == 200){
@@ -125,7 +125,7 @@ export default{
             this.resetError();
             if(this.Company.CompanyName != ''){
                 //add to MySql database
-                let uri = 'https://fleetmanagment.herokuapp.com/addCompany';
+                let uri = 'https://fleetmanagementserver.herokuapp.com/addCompany';
                 this.axios.post(uri, {CompanyName : this.Company.CompanyName }).then((response) => {
                     console.log(`response from add company ! ${response.status}`);
                      if(response.status == 200){

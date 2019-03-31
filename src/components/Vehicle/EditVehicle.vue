@@ -325,7 +325,7 @@ export default {
 
          
         
-                    let uri = 'https://fleetmanagment.herokuapp.com/addVehicle';
+                    let uri = 'https://fleetmanagementserver.herokuapp.com/addVehicle';
                     
                     this.axios.post(uri, {
                             VehicleTypeID :  this.Vehicle.VehicleTypeID,
@@ -391,10 +391,11 @@ export default {
                 }else if(this.checkActivationYear() == false){
                     this.errorActivationMonth="Cannot edit car that was activated for more than 4 years !";
                 }else{
+                        
                       this.Vehicle.VehicleTypeID = parseInt(this.SelectedTypeID);
                          this.Vehicle.displayedColor=this.displayColorSelector();
 
-                        let uri = `https://fleetmanagment.herokuapp.com/updateVehicle/${this.Vehicle.VehicleID}`;
+                        let uri = `https://fleetmanagementserver.herokuapp.com/updateVehicle/${this.Vehicle.VehicleID}`;
                         this.axios.post(uri,{
                             VehicleTypeID : this.Vehicle.VehicleTypeID,
                             LicensePlate : this.Vehicle.LicensePlate,
@@ -406,7 +407,7 @@ export default {
                         }).then((response)=>{
                                   console.log(`response from update vehicle ! ${response.status}`);
                                   if(response.status == 200){
-                                      this.$store.dispatch('editVehicle',tempVehicleEdit);
+                        this.$store.dispatch('editVehicle',Object.assign({},this.Vehicle));
                         this.SelectedVehicleID = -1;
                         this.SelectedTypeID = -1;
                         this.errorSetup();

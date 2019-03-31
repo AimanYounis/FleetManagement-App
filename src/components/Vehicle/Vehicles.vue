@@ -22,7 +22,7 @@
     </tr>
   </thead>
   <tbody>
-    <tr v-for="veh in filteredData" :key="veh.VehicleID" v-bind:class="veh.displayedColor">
+    <tr v-for="veh in filteredData()" :key="veh.VehicleID" v-bind:class="veh.displayedColor">
       <td>{{veh.CompanyName}}</td>
       <td>{{veh.IsElectronic}}</td>
       <td>{{veh.Model}}</td>
@@ -39,7 +39,7 @@
 
 
 
-        </div><!--container-->
+        </div>
 
 </template>
 
@@ -47,11 +47,12 @@
 export default {
     data(){
         return{
-          search:''
+          search:'',
         }
     },
-   computed:{
-      filteredData(){
+  
+   methods:{
+    filteredData(){
         return this.$store.getters.getData.filter((p)=>{
               return p.Model.toLowerCase().includes(this.search.toLowerCase()) || p.LicensePlate.toLowerCase().includes(this.search.toLowerCase()) 
               || p.ActivationMonth.toLowerCase().includes(this.search.toLowerCase()) 

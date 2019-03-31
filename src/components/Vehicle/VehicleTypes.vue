@@ -156,7 +156,7 @@
             this.VehicleType.CarCompanyID = parseInt(this.SelectedCompanyID);
             tempTypeEdit = Object.assign({},this.VehicleType);
 
-             let uri = `https://fleetmanagment.herokuapp.com/updateVehicleType/${this.VehicleType.VehicleTypeID}`;
+             let uri = `https://fleetmanagementserver.herokuapp.com/updateVehicleType/${this.VehicleType.VehicleTypeID}`;
                 this.axios.post(uri, {CarCompanyID : this.VehicleType.CarCompanyID,
                  Model :this.VehicleType.Model, IsElectronic : this.VehicleType.IsElectronic}).then((response) => {
                   console.log(`response from update company ! ${response.status}`);
@@ -194,7 +194,7 @@
         }else{
            this.VehicleType.CarCompanyID = parseInt(this.SelectedCompanyID);
 
-             let uri = `https://fleetmanagment.herokuapp.com/addVehicleType`;
+             let uri = `https://fleetmanagementserver.herokuapp.com/addVehicleType`;
                 this.axios.post(uri, {CarCompanyID : this.VehicleType.CarCompanyID,
                  Model :this.VehicleType.Model, IsElectronic : this.VehicleType.IsElectronic}).then((response)=>{
                     if(response.status == 200){

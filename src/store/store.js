@@ -62,7 +62,7 @@ export const store = new Vuex.Store({
     },
     mutations:{
         addVehicleCompany:(state)=>{
-            let uri = 'https://fleetmanagment.herokuapp.com/getCompanies';
+            let uri = 'https://fleetmanagementserver.herokuapp.com/getCompanies';
             axios.get(uri).then(response => {
                 response.data.forEach(e =>{
                  const index = state.VehicleCompanies.findIndex(p => p.VehicleCompanyID === e.VehicleCompanyID);
@@ -82,7 +82,7 @@ export const store = new Vuex.Store({
             }
         },
         addVehicleType:(state,VehcileTypeObject)=>{
-            let uri = 'https://fleetmanagment.herokuapp.com/getVehicleTypes';
+            let uri = 'https://fleetmanagementserver.herokuapp.com/getVehicleTypes';
             axios.get(uri).then(response => {
                 response.data.forEach(e =>{
                  const index = state.VehicleTypes.findIndex(p => p.VehicleTypeID === e.VehicleTypeID);
@@ -101,7 +101,7 @@ export const store = new Vuex.Store({
             }
         },
         addVehicle:(state)=>{
-           let uri = 'https://fleetmanagment.herokuapp.com/getVehicles';
+           let uri = 'https://fleetmanagementserver.herokuapp.com/getVehicles';
            axios.get(uri).then(response => {
                response.data.forEach(e =>{
                 const index = state.Vehicles.findIndex(p => p.VehicleID === e.VehicleID);
