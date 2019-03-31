@@ -3,11 +3,11 @@
 
             <div class="row" style="margin-bottom:15px">
         <label for="chooseAction" class="Column">Please Choose Action : </label>
-         <label>
+        <!-- <label>
             <input type="radio" style="margin-left:20px" name="VehicleAction" class="Column" @click="updateStatus=!updateStatus" :disabled="updateStatus"> Update Vehicle
-        </label>
+        </label>-->
          <label>
-            <input type="radio" style="margin-left:20px" name="VehicleAction" class="Column" @click="updateStatus=!updateStatus" checked :disabled="!updateStatus"> Add Vehicle
+            <input type="radio" style="margin-left:20px" name="VehicleAction" class="Column" @click="updateStatus=!updateStatus" :checked="!updateStatus" :disabled="!updateStatus"> Add Vehicle
         </label>
 
         </div>
@@ -22,7 +22,7 @@
    </div>
     -->
 
-     <div class="row">
+   <!--  <div class="row">
         
       <label for="VehicleIDinput" class="Column">Vehicle ID :</label>
       <select style="width:180px;margin-left:63px" class="Column" v-model="SelectedVehicleID" :disabled="(!updateStatus)" @click="UpdateFields" v-if="updateStatus">
@@ -33,44 +33,42 @@
 
       <p style="color:red">  {{errorCheckboxID}}  </p>
        <p style="color:red">{{errorID}}</p>
-  </div>
+  </div>-->
   
 
    
 
     <div class="row">
-  <label for="VehicleTypeIdInput" class="Column">Vehicle Type ID :</label>
-   <select class="Column" style="margin-left:27px;width:180px" v-model="SelectedTypeID" @click="UpdateIsElectric">
-                <option v-for="li in getVehicleTypes" :key="li.VehicleTypeID">{{li.VehicleTypeID}}</option>
+  <label class="Column">Vehicle Type:</label>
+   <select class="Column" style="margin-left:27px;width:180px"  v-model="SelectedTypeID" @change="UpdateIsElectric()">
+                <option v-for="li in getVehicleTypes" :key="li.VehicleTypeID" :value="li.VehicleTypeID">{{li.Model}}</option>
     </select>  
-    <p v-if="getVehicleCompanyNameAndModel !== ''">{{getVehicleCompanyNameAndModel}} </p>
+    <p>Electic is : {{IsEle}}</p>
    <p style="color:red"> {{errorSelectedType}} </p>
   </div>
 
      <div class="row">
-    <label for="LicensePlateInput" class="Column">License Plate :</label>
+    <label class="Column">License Plate :</label>
     <input type="text" class="Column" style="margin-left:40px;width:180px" placeholder="Format : 000-00-000" v-model="Vehicle.LicensePlate">
-     <label style="margin-left:10px" class="Column">e.g, 123-45-678</label>
     <p style="color:red">{{errorLicensePlate}}</p>
    </div>
 
     <div class="row">
-    <label for="ActivationMonthInput" class="Column">Activation Month :</label>
+    <label  class="Column">Activation Month :</label>
     <input type="month" class="Column" style="width:180px;margin-left:16px" max="2019-03" min="2015-03" v-model="Vehicle.ActivationMonth">
-    <label style="margin-left:10px" class="Column">e.g, April 2018</label>
     <p style="color:red" >{{errorActivationMonth}}</p>
     
    </div>
 
     <div class="row">
-    <label for="PurchaseMonthInput" class="Column">Purchase Month :</label>
+    <label class="Column">Purchase Month :</label>
     <input type="month" style="width:180px;margin-left:20px" class="Column" placeholder="Enter Purchase Month , format mm/yyyy" v-model="Vehicle.PurchaseMonth">
     <p style="color:red">{{errorPurchaseMonth}}</p>
    </div>
 
     <div class="row">
     <label for="BatteryExpiryDateInput" class="Column">Battery Expiry Date :</label>
-    <input type="date" style="width:180px" class="Column" placeholder="Enter Battery Expiry Date , format mm/yyyy" v-model="Vehicle.BatteryExpiryDate" :disabled="IsEle">
+    <input type="date" style="width:180px" class="Column" placeholder="Enter Battery Expiry Date , format mm/yyyy" v-model="Vehicle.BatteryExpiryDate" :disabled="!IsEle">
     <p style="color:red">{{errorBatteryExpiryDate}}</p>
    </div>
 
@@ -89,6 +87,30 @@
   <strong>Success!</strong> Vehicle has been updated!.
 </div>
 <hr>
+<table class="table table-hover">
+    <thead  class="thead-dark"> 
+  <tr>
+    <th>Vehicle Type and company</th>
+    <th>License Plate</th> 
+    <th>Activation Month</th>
+    <th>Purchase Month</th>
+    <th>Battery Expiry Date</th>
+    <th>Remarks</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr v-for="vehicle in getVehicles" :key="vehicle.VehicleID">
+    <td>{{getVehicleCompanyNameAndModel(vehicle)}}</td>
+    <td>{{vehicle.LicensePlate}}</td>
+    <td>{{vehicle.ActivationMonth}}</td> 
+    <td>{{vehicle.PurchaseMonth}}</td>
+    <td>{{vehicle.BatteryExpiryDate}}</td>
+    <td>{{vehicle.Remarks}}</td>
+    <td><button @click="UpdateFields(vehicle)">Edit</button></td>
+  </tr>
+    </tbody>
+</table>
+
     </div>
 </template>
 
@@ -120,8 +142,9 @@ export default {
                      LicensePlate:'',
                      ActivationMonth:'',
                      PurchaseMonth:'',
-                     BatteryExpiryDate:'',
-                     Remarks:''
+                     BatteryExpiryDate:null,
+                     Remarks:'',
+                     displayedColor:'white'
                 },
                
 
@@ -140,42 +163,87 @@ export default {
              },
              getVehicles(){
                  return this.$store.getters.getVehicles;
-             },
-             getVehicleCompanyNameAndModel(){
+             }
+
+        },
+        methods:{
+            displayColorSelector(){
+                let currentDate = new Date();
+                let month = currentDate.getUTCMonth() + 1;
+                let year = currentDate.getUTCFullYear();
+
+                let ActivationDate = this.Vehicle.ActivationMonth.split("-");
+                //check if it is displayed as RED
+            // if((parseInt(year - ActivationDate[0])) > 5 ){
+            //   return 'red';
+            // }else if(year -(parseInt(ActivationDate[0])) == 5 && (((parseInt(ActivationDate[1]))-month) <= 0)){
+            //       return 'red';
+            // }else{
+                //Check if it displayed as YELLOW
+                 let PurchaseDate = this.Vehicle.PurchaseMonth.split("-");
+                if(year - (parseInt(PurchaseDate[0])) > 3){
+                    return 'yellow';
+                }else if((year - parseInt(PurchaseDate[0]) == 3)&&((parseInt(PurchaseDate[1])-month) <= 0)){
+                    return 'yellow'
+                }else{
+                    if(this.IsEle){
+                        //Check if it is Displayed as PINK
+                        let ExpiryDay = this.Vehicle.BatteryExpiryDate.charAt(8)+""+this.Vehicle.BatteryExpiryDate.charAt(9);
+                        let ExpiryDate = this.Vehicle.BatteryExpiryDate.split("-");  
+                         if(((parseInt(ExpiryDate[0]) - year) < 0)){
+                             return 'pink';
+                         }else if(((parseInt(ExpiryDate[0]) - year) == 0) && (parseInt(ExpiryDate[1]) - month) == 0 ){
+                             if( ((parseInt(ExpiryDay) - parseInt(ExpiryDate[2])) < 0)){
+                                 return 'pink';
+                             }else{
+                                return 'blue';
+                             }               
+                         }else{
+                            return 'white';
+                         }
+
+                    }else{
+                        return 'white';
+                    }
+                }
+          
+            //}
+            },
+            editButton(){
+                this.updateStatus=!this.updateStatus;
+
+            },
+           getVehicleCompanyNameAndModel(vehicleObj){
                  let str ='';
                  this.getVehicleTypes.forEach(element => {
-                     if(element.VehicleTypeID == this.SelectedTypeID){
+                     if(element.VehicleTypeID == vehicleObj.VehicleTypeID){
                          this.getVehicleCompanies.forEach(p =>{
                              if(element.CarCompanyID == p.VehicleCompanyID){
-                                 str += `Model : ${element.Model}, Company : ${p.CompanyName}`
+                                 str += ` ${p.CompanyName} ,${element.Model}`;
                                  return str;
                              }
                          });
                      }
                  });
                  return str;
-             }
-
-
-
-        },
-        methods:{
+             },
             dateValidation(){
                 let currentDate = new Date();
                 let month = currentDate.getUTCMonth() + 1;
                 let year = currentDate.getUTCFullYear();
 
                 let yearFromInput = this.Vehicle.ActivationMonth.split("-");
+
                 if(year - parseInt(yearFromInput[0]) > 4){
                     return false;
-                }else if((year - parseInt(yearFromInput[0])) == 4){
-                     if(parseInt(yearFromInput[1] >= month)){
+                }else if((year - parseInt(yearFromInput[0])) == 4){ 
+                     if(parseInt(yearFromInput[1])+1 - month >= 0){
                             return true;
                         }else{
                             return false;
                         }
                 }else if((year - parseInt(yearFromInput[0])) == 0){
-                        if(month >= parseInt(yearFromInput[1])){
+                        if(parseInt(yearFromInput[1])+1 - month <= 0){
                             return true;
                         }else{
                             return false;
@@ -225,22 +293,24 @@ export default {
                 let FormatForLicensePlate = new RegExp('^[0-9]{3,3}-[0-9]{2,2}-[0-9]{3,3}$');
                 return FormatForLicensePlate.test(str);
             },
-            UpdateFields(){
-                if(this.SelectedVehicleID != -1){
-             this.getVehicles.forEach(p=>{
-                    if(this.SelectedVehicleID == p.VehicleID){
-                        this.Vehicle.VehicleID = this.SelectedVehicleID;
-                        this.SelectedTypeID = p.VehicleTypeID;
-                        this.Vehicle.LicensePlate = p.LicensePlate;
-                        this.Vehicle.ActivationMonth = p.ActivationMonth;
-                        this.Vehicle.PurchaseMonth = p.PurchaseMonth;
-                        this.Vehicle.BatteryExpiryDate = p.BatteryExpiryDate.substring(0,10);
-                        this.Vehicle.Remarks=p.Remarks;
-                    }
-                });
-                }
-               
-            },
+            UpdateFields(vehicle){
+                        if(!this.updateStatus){
+                             this.updateStatus=!this.updateStatus;
+                        }
+                        this.Vehicle.VehicleID = vehicle.VehicleID;
+                        this.SelectedTypeID = vehicle.VehicleTypeID;
+                        this.Vehicle.LicensePlate = vehicle.LicensePlate;
+                        this.Vehicle.ActivationMonth = vehicle.ActivationMonth;
+                        this.Vehicle.PurchaseMonth = vehicle.PurchaseMonth;
+                        if(vehicle.BatteryExpiryDate != null){
+                                this.Vehicle.BatteryExpiryDate = vehicle.BatteryExpiryDate.substring(0,10);
+                        }
+                        this.Vehicle.BatteryExpiryDate = vehicle.BatteryExpiryDate;
+                        this.Vehicle.Remarks=vehicle.Remarks;
+                        this.UpdateIsElectric();
+                   
+                },
+                
             errorSetup(){
                     this.errorID="";
                     this.errorCheckboxID="";
@@ -256,12 +326,7 @@ export default {
                 //Connect tot the database first then add to local store !
                 this.errorSetup();
                 //Need to add more validations !! + REGEX must be added !!
-                let index = this.getVehicles.findIndex(p => p.VehicleID == parseInt(this.Vehicle.VehicleID));
-                console.log(`the index is : ${index}`);
-                console.log(`the status is : ${index != -1}`);
-                if(index != -1){
-                    this.errorID="This ID already been taken! , Please choose another one";
-                }else if(this.SelectedTypeID === -1){
+               if(this.SelectedTypeID === -1){
                     this.errorSelectedType = "Please choose type ID !";
                 }else if(!this.CheckRegex(this.Vehicle.LicensePlate)){
                      this.errorLicensePlate = "The format should be 000-00-000";
@@ -278,23 +343,33 @@ export default {
                 }*/else if(this.dateValidation() == false){
                     this.errorActivationMonth="The Activation Month should be between 2019/3 - 2015/3";
                 }else{
+                    if(this.IsEle == false){
+                        this.Vehicle.BatteryExpiryDate =null;
+                    }
                     this.Vehicle.VehicleID = parseInt(this.Vehicle.VehicleID);
                     this.Vehicle.VehicleTypeID = parseInt(this.SelectedTypeID);
-                    tempVehicle = Object.assign({},this.Vehicle);
+                    this.Vehicle.displayedColor=this.displayColorSelector();
 
+         
+        
                     let uri = 'https://fleetmanagment.herokuapp.com/addVehicle';
+                    //https://fleetmanagment.herokuapp.com/
+                    
+                    
                     this.axios.post(uri, {
-                            VehicleID :   this.Vehicle.VehicleID,
                             VehicleTypeID :  this.Vehicle.VehicleTypeID,
                             LicensePlate : this.Vehicle.LicensePlate,
                             ActivationMonth : this.Vehicle.ActivationMonth,
                             PurchaseMonth : this.Vehicle.PurchaseMonth,
                             BatteryExpiryDate : this.Vehicle.BatteryExpiryDate,
-                            Remarks : this.Vehicle.Remarks
+                            Remarks : this.Vehicle.Remarks,
+                            displayedColor : this.Vehicle.displayedColor    
                     }).then((response)=>{
                          console.log(`response from add vehicle ! ${response.status}`);
                         if(response.status == 200){
-                        this.$store.dispatch('addVehicle',tempVehicle);
+                            console.log(`The color is : ${this.Vehicle.displayedColor}`);
+                        this.$store.dispatch('addVehicle');
+                        tempVehicle = Object.assign({},this.Vehicle);
                          this.SelectedTypeID = -1;
                             this.errorSetup();
 
@@ -312,10 +387,11 @@ export default {
                 }
             },
             UpdateIsElectric(){
+            
                 if(this.SelectedTypeID !== -1){
                     this.getVehicleTypes.forEach(element=>{
                         if(element.VehicleTypeID == this.SelectedTypeID){
-                            if(!element.IsElectronic){
+                            if(element.IsElectronic){
                                 this.IsEle=true;
                                  this.Vehicle.BatteryExpiryDate='';
                             }else{
@@ -329,9 +405,7 @@ export default {
             editVehicle(){
                 let tempVehicleEdit ={};
                 this.errorSetup();
-                if(this.SelectedVehicleID === -1){
-                    this.errorCheckboxID="Please choose Vehicle ID !";
-                }else if(this.SelectedTypeID === -1){
+                if(this.SelectedTypeID === -1){
                     this.errorSelectedType = "Please choose type ID !";
                 }else if(!this.CheckRegex(this.Vehicle.LicensePlate)){
                      this.errorLicensePlate = "The format should be 000-00-000";
@@ -343,15 +417,12 @@ export default {
                     this.errorBatteryExpiryDate ="Please fill the battery expiry date field";
                 }else if(this.PurchaseMonth === ''){
                     this.errorPurchaseMonth="Please fill the Purchase month field";
-                }/*else if(this.CheckIfActivationAfterPurchase() == false){
-                    this.errorActivationMonth="Cannot activate before purchase !!";
-                }*/else if(this.checkActivationYear() == false){
+                }else if(this.checkActivationYear() == false){
                     this.errorActivationMonth="Cannot edit car that was activated for more than 4 years !";
                 }else{
-                      this.Vehicle.VehicleID = parseInt(this.SelectedVehicleID);
                       this.Vehicle.VehicleTypeID = parseInt(this.SelectedTypeID);
                         tempVehicleEdit = Object.assign({},this.Vehicle);
-
+                         this.Vehicle.displayedColor=this.displayColorSelector();
                         let uri = `https://fleetmanagment.herokuapp.com/updateVehicle/${this.Vehicle.VehicleID}`;
                         this.axios.post(uri,{
                             VehicleTypeID : this.Vehicle.VehicleTypeID,
@@ -359,7 +430,8 @@ export default {
                             ActivationMonth : this.Vehicle.ActivationMonth,
                             PurchaseMonth : this.Vehicle.PurchaseMonth,
                             BatteryExpiryDate : this.Vehicle.BatteryExpiryDate,
-                            Remarks: this.Vehicle.Remarks
+                            Remarks: this.Vehicle.Remarks,
+                            displayedColor : this.Vehicle.displayedColor
                         }).then((response)=>{
                                   console.log(`response from update vehicle ! ${response.status}`);
                                   if(response.status == 200){

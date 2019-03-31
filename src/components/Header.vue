@@ -16,10 +16,3 @@
 </nav>
 
 </template>
-<!-- <li role="presenatation"><router-link to ="/">Home</router-link></li>
- // <li role="presenatation"><router-link to ="/user">User</router-link></li>
-   <router-link to="/editVehicle" tag="li" active-class="active" ><a>Edit Vehicle</a></router-link>
-/--/!>
-
-[0-9]{3,3}-[0-9]{2,2}-[0-9]{3,3}$
-///// <router-link to="/user" tag="li" active-class="active"><a>User</a></router-link>

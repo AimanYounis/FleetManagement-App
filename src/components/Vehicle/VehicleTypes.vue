@@ -5,14 +5,14 @@
       <div class="row" style="margin-bottom:15px">
            <label for="chooseAction" class="Column">Please Choose Action : </label>
 
-             <label>
+         <!--    <label>
             <input type="radio" style="margin-left:20px" name="TypeAction" class="Column" @click="updateStatus=!updateStatus" :disabled="updateStatus"> Update Type
-        </label>
+        </label>-->
          <label>
-            <input type="radio" style="margin-left:20px" name="TypeAction" class="Column" @click="updateStatus=!updateStatus" checked :disabled="!updateStatus"> Add Type
+            <input type="radio" style="margin-left:20px" name="TypeAction" class="Column" @click="updateStatus=!updateStatus" :checked="!updateStatus" :disabled="!updateStatus"> Add Type
         </label>
       </div>
-
+  <!--
     <div class="row">
       <label class="Column" for="CompanyIDinput">Type ID : </label>
       <input type="number" style="margin-left:38px;width:180px" class="Column" placeholder="Enter Type ID" min="1" max="5000" v-model="VehicleType.VehicleTypeID" :disabled="updateStatus"  v-if="!updateStatus">
@@ -21,7 +21,7 @@
        </select>   
       <p style="color:red">  {{errorCheckboxID}}  </p>
        <p style="color:red">{{errorID}}</p>
-  </div>
+  </div>-->
 
   <!-- <div class="form-group">
     <label for="CompanyIDinput">Type ID </label>
@@ -29,11 +29,10 @@
     <p style="color:red">{{errorID}}</p>
    </div>-->
  <div class="row" style="margin-bottom:15px">
-   <label for="SelectedCompanyInput" class="Column">Company ID :</label>
+   <label for="SelectedCompanyInput" class="Column">Company :</label>
    <select class="Column" style="margin-top:10px;margin-left:5px;width:180px" v-model="SelectedCompanyID">
-                <option v-for="li in getVehicleCompanies" :key="li.VehicleCompanyID">{{li.VehicleCompanyID}}</option>
+                <option v-for="li in getVehicleCompanies" :key="li.VehicleCompanyID" :value="li.VehicleCompanyID">{{li.CompanyName}}</option>
     </select>  
-      <p v-if="getVehicleCompanyName !== ''" class="Column"> Company Name : {{getVehicleCompanyName}} </p>
     <p style="color:red"> {{errorSelectedCompany}} </p>
   
   </div>
@@ -63,6 +62,25 @@
 <div class="alert alert-success" v-if="successEdit">
   <strong>Success!</strong> Vehicle type has been updated!.
 </div>
+<hr>
+  <table class="table table-hover">
+      <thead class="thead-dark">
+          <tr>
+            <th>Company</th>
+            <th>Model</th>
+            <th>Engine Type</th>
+          </tr>
+      </thead>
+      <tbody>
+        <tr v-for="type in getVehicleTypes" :key="type.VehicleTypeID">
+          <td>{{getCompanyName(type)}}</td>
+          <td>{{type.Model}}</td>
+          <td v-if="type.IsElectronic == 0">Petrol</td>
+          <td v-if="type.IsElectronic != 0">Electric</td>
+          <td><button @click="UpdateFields(type)">Edit</button></td>
+        </tr>
+      </tbody>
+  </table>
 </div>
 </template>
 <script>
@@ -107,27 +125,34 @@
       }
     },
     methods:{
-      UpdateFields(){
-          this.getVehicleTypes.forEach(element =>{
-            if(element.VehicleTypeID == this.SelectedTypeID){
-              this.VehicleType.VehicleTypeID = this.SelectedTypeID;
-              this.SelectedCompanyID = element.CarCompanyID;
-              this.VehicleType.Model = element.Model;
-              this.VehicleType.IsElectronic = element.IsElectronic;
+      getCompanyName(vehicleType){
+        let str ='';
+        this.getVehicleCompanies.forEach(element =>{
+            if(element.VehicleCompanyID == vehicleType.CarCompanyID){
+               str += ''+element.CompanyName;
             }
-          });
+        });
+        return str;
+      },
+      UpdateFields(type){
+              if(!this.updateStatus){
+                    this.updateStatus=!this.updateStatus;
+              }
+              this.VehicleType.VehicleTypeID = type.VehicleTypeID;
+              this.VehicleType.CarCompanyID = type.CarCompanyID;
+              this.SelectedCompanyID = type.CarCompanyID;
+              this.VehicleType.Model = type.Model;
+              this.VehicleType.IsElectronic = type.IsElectronic;
+          
       },
       EditVehicleType(){
 
           let tempTypeEdit ={};
-          if(this.SelectedTypeID === -1){
-            this.errorCheckboxID = 'Please choose Vehicle Type ID';
-          }else if(this.SelectedCompanyID === -1){
+          if(this.SelectedCompanyID === -1){
             this.errorSelectedCompany = 'Please choose Company ID';
           }else if(this.VehicleType.Model === ''){
                 this.errorModel="Please fill the Model";
           }else{
-            this.VehicleType.VehicleTypeID = parseInt(this.SelectedTypeID);
             this.VehicleType.CarCompanyID = parseInt(this.SelectedCompanyID);
             tempTypeEdit = Object.assign({},this.VehicleType);
 
@@ -161,24 +186,20 @@
         let tempType={};
         //Connect to the Database first then add to local store
         
-        //Need to add Validations !!!
-      const index =  this.getVehicleTypes.findIndex(p => p.VehicleTypeID === parseInt(this.VehicleType.VehicleTypeID));
-        if(index !== -1){
-            this.errorID="This ID already been taken! , Please choose another one";
-        }else if(this.VehicleType.Model === ''){
+    
+      if(this.VehicleType.Model === ''){
             this.errorModel="Please fill the Model";
         }else if(this.SelectedCompanyID === -1){
             this.errorSelectedCompany = 'Please choose Company ID';
         }else{
-           this.VehicleType.VehicleTypeID = parseInt(this.VehicleType.VehicleTypeID);
            this.VehicleType.CarCompanyID = parseInt(this.SelectedCompanyID);
-           tempType=Object.assign({},this.VehicleType);
 
              let uri = `https://fleetmanagment.herokuapp.com/addVehicleType`;
-                this.axios.post(uri, {VehicleTypeID : this.VehicleType.VehicleTypeID,CarCompanyID : this.VehicleType.CarCompanyID,
+                this.axios.post(uri, {CarCompanyID : this.VehicleType.CarCompanyID,
                  Model :this.VehicleType.Model, IsElectronic : this.VehicleType.IsElectronic}).then((response)=>{
                     if(response.status == 200){
-                       this.$store.dispatch('addVehicleType',tempType);
+                        tempType=Object.assign({},this.VehicleType);
+                       this.$store.dispatch('addVehicleType');
                        this.SelectedCompanyID=-1,
                        this.errorID='';
                        this.errorModel='';

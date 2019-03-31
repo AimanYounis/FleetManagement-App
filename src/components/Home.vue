@@ -41,9 +41,3 @@ export default {
 
 }
 </script>
-
-//Main page
-//Vehicle - show
-//add/edit Vehicles
-//add/edit VehiclesType
-//add/edit VechileCompany
