@@ -3,47 +3,21 @@
 
             <div class="row" style="margin-bottom:15px">
         <label for="chooseAction" class="Column">Please Choose Action : </label>
-        <!-- <label>
-            <input type="radio" style="margin-left:20px" name="VehicleAction" class="Column" @click="updateStatus=!updateStatus" :disabled="updateStatus"> Update Vehicle
-        </label>-->
+
          <label>
             <input type="radio" style="margin-left:20px" name="VehicleAction" class="Column" @click="updateStatus=!updateStatus" :checked="!updateStatus" :disabled="!updateStatus"> Add Vehicle
         </label>
 
         </div>
-    <!--
-        <label>
-            <input type="checkbox" @click="updateStatus=(!updateStatus)"> Update Vehicle
-          </label>
-     <div class="form-group">
-    <label for="VehicleIDinput">Vehicle ID </label>
-    <input type="number" class="form-control" placeholder="Enter Vehicle ID" min="1" max="5000" v-model="Vehicle.VehicleID" :disabled="updateStatus">
-    
-   </div>
-    -->
-
-   <!--  <div class="row">
-        
-      <label for="VehicleIDinput" class="Column">Vehicle ID :</label>
-      <select style="width:180px;margin-left:63px" class="Column" v-model="SelectedVehicleID" :disabled="(!updateStatus)" @click="UpdateFields" v-if="updateStatus">
-                <option v-for="l in getVehicles" :key="l.VehicleID">{{l.VehicleID}}</option>
-       </select>    
-        <input type="number" class="row" style="margin-left:63px;width:180px" placeholder="Enter Vehicle ID" min="1" max="5000" v-model="Vehicle.VehicleID" :disabled="updateStatus" v-if="!updateStatus">
-    
-
-      <p style="color:red">  {{errorCheckboxID}}  </p>
-       <p style="color:red">{{errorID}}</p>
-  </div>-->
-  
-
-   
 
     <div class="row">
   <label class="Column">Vehicle Type:</label>
    <select class="Column" style="margin-left:27px;width:180px"  v-model="SelectedTypeID" @change="UpdateIsElectric()">
                 <option v-for="li in getVehicleTypes" :key="li.VehicleTypeID" :value="li.VehicleTypeID">{{li.Model}}</option>
-    </select>  
-    <p>Electic is : {{IsEle}}</p>
+    </select>
+    <div class=row>
+        <p class="Column"> Engine type : <span v-if="IsEle == 0">Petrol</span>  <span v-if="IsEle == 1">Electic</span></p>
+    </div>  
    <p style="color:red"> {{errorSelectedType}} </p>
   </div>
 
@@ -187,6 +161,7 @@ export default {
                     return 'yellow'
                 }else{
                     if(this.IsEle){
+                         console.log("i'm inside here !!");
                         //Check if it is Displayed as PINK
                         let ExpiryDay = this.Vehicle.BatteryExpiryDate.charAt(8)+""+this.Vehicle.BatteryExpiryDate.charAt(9);
                         let ExpiryDate = this.Vehicle.BatteryExpiryDate.split("-");  
@@ -194,6 +169,7 @@ export default {
                              return 'pink';
                          }else if(((parseInt(ExpiryDate[0]) - year) == 0) && (parseInt(ExpiryDate[1]) - month) == 0 ){
                              if( ((parseInt(ExpiryDay) - parseInt(ExpiryDate[2])) < 0)){
+                                
                                  return 'pink';
                              }else{
                                 return 'blue';
@@ -207,11 +183,7 @@ export default {
                     }
                 }
           
-            //}
-            },
-            editButton(){
-                this.updateStatus=!this.updateStatus;
-
+         
             },
            getVehicleCompanyNameAndModel(vehicleObj){
                  let str ='';
@@ -307,6 +279,7 @@ export default {
                         }
                         this.Vehicle.BatteryExpiryDate = vehicle.BatteryExpiryDate;
                         this.Vehicle.Remarks=vehicle.Remarks;
+
                         this.UpdateIsElectric();
                    
                 },
@@ -353,8 +326,6 @@ export default {
          
         
                     let uri = 'https://fleetmanagment.herokuapp.com/addVehicle';
-                    //https://fleetmanagment.herokuapp.com/
-                    
                     
                     this.axios.post(uri, {
                             VehicleTypeID :  this.Vehicle.VehicleTypeID,
@@ -421,8 +392,8 @@ export default {
                     this.errorActivationMonth="Cannot edit car that was activated for more than 4 years !";
                 }else{
                       this.Vehicle.VehicleTypeID = parseInt(this.SelectedTypeID);
-                        tempVehicleEdit = Object.assign({},this.Vehicle);
                          this.Vehicle.displayedColor=this.displayColorSelector();
+
                         let uri = `https://fleetmanagment.herokuapp.com/updateVehicle/${this.Vehicle.VehicleID}`;
                         this.axios.post(uri,{
                             VehicleTypeID : this.Vehicle.VehicleTypeID,
